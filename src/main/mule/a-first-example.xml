@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="c50fef3c-baff-4694-a187-dc2af0f9f69a" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="a-first-exampleFlow" doc:id="b9b4f988-b837-445b-96bf-ae44ce7a5408" >
+		<http:listener doc:name="Listener" doc:id="d2b22536-527f-4841-b733-f0a82712031b" config-ref="HTTP_Listener_config" path="/hai"/>
+		<logger level="INFO" doc:name="Logger" doc:id="ae34b9dd-ed96-4689-ae77-0f97f36ebf0d" message="--- start ---"/>
+		<ee:transform doc:name="Transform Message" doc:id="37c3382a-bbe9-4b8e-851c-42f59985cb68" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+lookup("myflow",{"name":"kishore"})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<logger level="INFO" doc:name="Logger" doc:id="f445bc29-79a9-4bf8-bb2d-7e8c944d78e9" message="--- end ---"/>
+	</flow>
+	<flow name="myflow" doc:id="f08c8d18-a5d7-49e0-a017-deb950426fd5" >
+		<ee:transform doc:name="Transform Message" doc:id="55bb3b46-b0c2-4561-a63e-d0570ab00da3" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+"Hi" ++ payload.name++", welcome to lookup() function"]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="a-first-exampleFlow1" doc:id="682a2911-3b9a-4a7b-8662-374fe08e5af4" >
+		<ee:transform doc:name="Transform Message" doc:id="428a1114-0bfb-4a1a-a31b-d6c2f0ea7173" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+import  dw::core::Strings
+import  dw::core::Numbers
+//import capitalize,camelize from dw::core::Strings
+//import  * from dw::core::Strings
+import sayhello,add from dw::MyScript
+
+---
+{
+  "capatialize" : Strings::capitalize("abc"),
+  "camelize" : Strings::camelize("abc_def"),
+  "fromBinay" : Numbers::fromBinary("-10"),
+  "sayHello" : sayhello('Kishore'),
+  "add" : add(3,2)
+
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="a-first-exampleFlow2" doc:id="b406c07d-8213-44c7-bee7-59262c50f53e" >
+		<ee:transform doc:name="Transform Message" doc:id="a95e5cb0-3368-45a3-a79b-7920ec399671" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+ns ns0 http://mynamespace.com/
+---
+{
+	address: {
+		addType: payload.ns0#address.@"type",
+		street: {
+			name: payload.ns0#address.ns0#street.ns0#name,
+			number: payload.ns0#address.ns0#street.ns0#number
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+	<flow name="a-first-exampleFlow3" doc:id="b8184144-f06e-4095-a796-30e02aeabd71" >
+		<ee:transform doc:name="Transform Message" doc:id="d58e7f54-8eb2-4d1d-aad6-d4ab6a1302fc" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/xml
+ns ns0 http://mynamespace.com/
+---
+{
+	ns0#address: {
+		ns0#street: {
+			ns0#name: payload.address.street.name
+		}
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>

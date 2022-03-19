@@ -1,0 +1,51 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="address-xml" format="xml">
+      <types:example format="xml" element="{http://mynamespace.com/}address" location="examples/address.xml"/>
+    </types:type>
+    <types:type name="address-json" format="json">
+      <types:shape format="weave" example="examples/address.json"><![CDATA[%dw 2.0
+
+type address_json = {|
+  address: {|
+    addType: String, 
+    street: {|
+      name: String, 
+      number: Number {"typeId": "int"}
+    |}
+  |}
+|} {"example": "{\\\"address\\\":{\\\"addType\\\":\\\"home\\\",\\\"street\\\":{\\\"name\\\":\\\"Italia\\\",\\\"number\\\":2164}}}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#a95e5cb0-3368-45a3-a79b-7920ec399671">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="address-xml"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="address-json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#d58e7f54-8eb2-4d1d-aad6-d4ab6a1302fc">
+    <types:processor-declaration>
+      <types:input-event>
+        <types:message>
+          <types:payload type="address-json"/>
+        </types:message>
+      </types:input-event>
+      <types:output-event>
+        <types:message>
+          <types:payload type="address-xml"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>
